@@ -1,0 +1,35 @@
+version: '3.9'
+
+name: danit
+
+services:
+  jenkins:
+    image: jenkins/jenkins:lts
+    restart: always
+    ports:
+      - 3000:8080
+    user: root
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
+      - ~/danit/jenkins_home:/var/jenkins_home
+
+  slave:
+    image: jenkins/agent:latest
+    user: root
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
+      - jenkins-slave:/var/jenkins_home/
+    command: >
+      java -jar /usr/share/jenkins/agent.jar
+        -url http://jenkins:8080
+        -secret 57445c7670c81a566a10975aa66a525d39cba4396a51a93399243110f1410a9f
+        -name "slave-01"
+        -workDir "/var/jenkins_home"
+    environment:
+      VAR: VAL
+
+volumes:
+  jenkins-home:
+  jenkins-slave:
